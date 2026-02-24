@@ -26,4 +26,11 @@ def seq_count(seq):
             d[base] += 1
     return d
 
+def seq_reverse(seq, n):
+    fragment = seq[:n]
+    new_str = ""
+    for base in fragment:
+        new_str = base + new_str
+    return new_str
+
 
