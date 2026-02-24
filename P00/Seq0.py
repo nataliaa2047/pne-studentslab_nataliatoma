@@ -8,3 +8,11 @@ def seq_read_fasta(FILENAME):
     body = file_contents.split("\n")[1:]
     sequence = "".join(body)  #we transform the list into a string
     return sequence
+
+def seq_len(seq):
+    count = 0
+    for base in seq:
+        count += 1
+    return count
+
+
