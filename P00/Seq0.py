@@ -28,9 +28,15 @@ def seq_count(seq):
 
 def seq_reverse(seq, n):
     fragment = seq[:n]
-    new_str = ""
-    for base in fragment:
-        new_str = base + new_str
-    return new_str
+    return fragment[::-1]
+
+def seq_complement(seq):
+    complementary_bases = {"A": "T", "C": "G", "G": "C", "T": "A"}
+    new_seq = ""
+    for base in seq:
+        new_seq += complementary_bases[base]
+    return new_seq
+
+
 
 
