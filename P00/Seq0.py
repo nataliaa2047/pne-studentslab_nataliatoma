@@ -19,4 +19,11 @@ def seq_count_base(seq, base):
     count = seq.count(base)
     return count
 
+def seq_count(seq):
+    d = {'A': 0, 'T': 0, 'C': 0, 'G': 0}
+    for base in seq:
+        if base in d:
+            d[base] += 1
+    return d
+
 
