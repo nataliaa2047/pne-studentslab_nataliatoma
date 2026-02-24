@@ -15,4 +15,8 @@ def seq_len(seq):
         count += 1
     return count
 
+def seq_count_base(seq, base):
+    count = seq.count(base)
+    return count
+
 
