@@ -9,13 +9,13 @@ def seq_read_fasta(FILENAME):
     sequence = "".join(body)  #we transform the list into a string
     return sequence
 
-def seq_len(seq):      #El none indica que el parámetro "seq" es opcional; si no se escribe ningún parámetro, su valor por defecto será None
+def seq_len(seq=None):      #El none indica que el parámetro "seq" es opcional; si no se escribe ningún parámetro, su valor por defecto será None
     count = 0
     for base in seq:
         count += 1
     return count
 
-def seq_count_base(seq, base):
+def seq_count_base(seq, base=None):
     count = seq.count(base)
     return count
 
@@ -26,7 +26,7 @@ def seq_count(seq):
             d[base] += 1
     return d
 
-def seq_reverse(seq, n):
+def seq_reverse(seq, n=None):
     fragment = seq[:n]
     return fragment[::-1]
 
