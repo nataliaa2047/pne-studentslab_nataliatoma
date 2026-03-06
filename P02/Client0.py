@@ -5,3 +5,7 @@ class Client:
 
     def ping(self):
         print("OK")
+
+
+
+
