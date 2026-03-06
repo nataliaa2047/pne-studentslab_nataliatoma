@@ -11,6 +11,7 @@ PORT = 8080
 
 # -- Create a client object
 c = Client(IP, PORT)
+print(c)
 
 # -- Test the ping method
 c.__str__()
