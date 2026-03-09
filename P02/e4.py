@@ -26,5 +26,9 @@ for gene_name in genes:
     sequence_str = str(s)              #lines 26-29: we send the DNA sequence to the server
     print("To Server:", sequence_str)
     response2 = c.talk(sequence_str)
-    print(f"From Server:\n{response2}\n")
+    print(f"From Server: \n{response2}\n")
+
+
+
+
 
