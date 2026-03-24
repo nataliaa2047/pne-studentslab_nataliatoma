@@ -1,0 +1,10 @@
+1) The request line for the first URL is: "GET /hello HTTP/1.1"
+2) The resource that the client is asking for in the first URL is: "/hello"
+
+3) The request line for the second URL is: "GET /file.html HTTP/1.1"
+4) The resource that the client is asking for in the second URL is: "/file.html"
+
+5) The request line for the third URL is: "GET /hi/there?name=virus&type=corona HTTP/1.1"
+6) The resource that the client is asking for in the third URL is: "/hi/there?name=virus&type=corona"
+
+7) The URL that we have to write in the browser for accessing the /dna/u5 resource is: "https://127.0.0.1:8080/dna/u5"
