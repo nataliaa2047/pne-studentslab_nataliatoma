@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Troll Face",
+    "age": 20,
+    "phones": [
+      {"type": "home", "number": "1111"},
+      {"type": "office", "number": "333"}
+    ]
+  },
+  {
+    "name": "Sax Guy",
+    "age": 40,
+    "phones": [
+      {"type": "home", "number": "9999-564"}
+    ]
+  },
+  {
+    "name": "Ricky Rickroll",
+    "age": 60,
+    "phones": [
+      {"type": "dance floor", "number": "6766534"},
+      {"type": "mobile", "number": "333"},
+      {"type": "fortnite", "number": "88778"}
+    ]
+  }
+]
