@@ -4,7 +4,7 @@ import termcolor
 from pathlib import Path
 import json
 import socket
-from Seq import Seq
+from Seq import Seq  # Ensure your Seq.py file is in the same folder!
 
 PORT = 8080
 socketserver.TCPServer.allow_reuse_address = True
@@ -62,13 +62,16 @@ class GenomeRequestHandler(http.server.BaseHTTPRequestHandler):
                     content = f.read()
                     self.send_html_response(200, content)
             except FileNotFoundError:
-                self.serve_error_file(is_json_format)
+                self.serve_error_file(
+                    is_json_format,
+                    title="Missing Homepage",
+                    message="The index.html file is missing from the server root directory."
+                )
 
         # --- BASIC ENDPOINTS ---
         elif self.path.startswith("/listSpecies"):
             limit_val = ""
             if "limit=" in self.path:
-                # Basic string isolate manipulation to extract values safely
                 raw_part = self.path.split("limit=")[1]
                 limit_val = raw_part.split("&")[0]
             self.handle_list_species(limit_val, is_json_format)
@@ -78,7 +81,12 @@ class GenomeRequestHandler(http.server.BaseHTTPRequestHandler):
             if "species=" in self.path:
                 raw_part = self.path.split("species=")[1]
                 species_val = raw_part.split("&")[0].strip().lower()
-            self.handle_karyotype(species_val, is_json_format)
+
+            if not species_val:
+                self.serve_error_file(is_json_format, title="Missing Parameter",
+                                      message="Please provide a ?species= parameter.")
+            else:
+                self.handle_karyotype(species_val, is_json_format)
 
         elif self.path.startswith("/chromosomeLength"):
             if "species=" in self.path and "chromo=" in self.path:
@@ -86,7 +94,11 @@ class GenomeRequestHandler(http.server.BaseHTTPRequestHandler):
                 chromo_val = self.path.split("chromo=")[1].split("&")[0].strip().lower()
                 self.handle_chromosome_length(species_val, chromo_val, is_json_format)
             else:
-                self.serve_error_file(is_json_format)
+                self.serve_error_file(
+                    is_json_format,
+                    title="Invalid Parameters",
+                    message="Chromosome length requests require both 'species' and 'chromo' parameters."
+                )
 
         # --- MEDIUM ENDPOINTS ---
         elif self.path.startswith("/geneLookup"):
@@ -120,10 +132,18 @@ class GenomeRequestHandler(http.server.BaseHTTPRequestHandler):
                 end_val = self.path.split("end=")[1].split("&")[0].strip()
                 self.handle_gene_list(chromo_val, start_val, end_val, is_json_format)
             else:
-                self.serve_error_file(is_json_format)
+                self.serve_error_file(
+                    is_json_format,
+                    title="Invalid Parameters",
+                    message="Region search requires 'chromo', 'start', and 'end' parameters."
+                )
 
         else:
-            self.serve_error_file(is_json_format)
+            self.serve_error_file(
+                is_json_format,
+                title="404 Page Not Found",
+                message=f"The requested path '{self.path}' does not exist on this server."
+            )
 
     # -------------------------------------------------------------
     # HANDLING EXECUTION BLOCKS
@@ -132,7 +152,8 @@ class GenomeRequestHandler(http.server.BaseHTTPRequestHandler):
     def handle_list_species(self, limit_val, is_json):
         data = get_ensembl_data("/info/species")
         if data is None or "species" not in data:
-            self.serve_error_file(is_json)
+            self.serve_error_file(is_json, title="Ensembl Error",
+                                  message="Failed to retrieve species list from Ensembl database.")
             return
 
         species_list = data.get("species", [])
@@ -158,7 +179,8 @@ class GenomeRequestHandler(http.server.BaseHTTPRequestHandler):
     def handle_karyotype(self, species, is_json):
         data = get_ensembl_data(f"/info/assembly_info/{species}")
         if data is None or "karyotype" not in data:
-            self.serve_error_file(is_json)
+            self.serve_error_file(is_json, title="Species Not Found",
+                                  message=f"Could not find karyotype data for species: '{species}'.")
             return
 
         karyotype = data.get("karyotype", [])
@@ -175,7 +197,7 @@ class GenomeRequestHandler(http.server.BaseHTTPRequestHandler):
     def handle_chromosome_length(self, species, chromo, is_json):
         data = get_ensembl_data(f"/info/assembly_info/{species}")
         if data is None or "top_level_region" not in data:
-            self.serve_error_file(is_json)
+            self.serve_error_file(is_json, title="Data Error", message=f"Could not fetch data for species '{species}'.")
             return
 
         regions = data.get("top_level_region", [])
@@ -196,12 +218,15 @@ class GenomeRequestHandler(http.server.BaseHTTPRequestHandler):
                 </body></html>"""
                 self.send_html_response(200, html.encode("utf-8"))
                 return
-        self.serve_error_file(is_json)
+
+        self.serve_error_file(is_json, title="Chromosome Not Found",
+                              message=f"Chromosome '{chromo}' not found for species '{species}'.")
 
     def handle_gene_lookup(self, gene_name, is_json):
         data = get_ensembl_data(f"/lookup/symbol/homo_sapiens/{gene_name}")
         if data is None or "id" not in data:
-            self.serve_error_file(is_json)
+            self.serve_error_file(is_json, title="Gene Not Found",
+                                  message=f"The gene symbol '{gene_name}' could not be found.")
             return
 
         gene_id = data.get("id")
@@ -220,13 +245,15 @@ class GenomeRequestHandler(http.server.BaseHTTPRequestHandler):
     def handle_gene_seq(self, gene_name, is_json):
         lookup_data = get_ensembl_data(f"/lookup/symbol/homo_sapiens/{gene_name}")
         if lookup_data is None or "id" not in lookup_data:
-            self.serve_error_file(is_json)
+            self.serve_error_file(is_json, title="Gene Not Found",
+                                  message=f"Cannot look up sequence because gene '{gene_name}' does not exist.")
             return
 
         gene_id = lookup_data.get("id")
         seq_data = get_ensembl_data(f"/sequence/id/{gene_id}")
         if seq_data is None or "seq" not in seq_data:
-            self.serve_error_file(is_json)
+            self.serve_error_file(is_json, title="Sequence Missing",
+                                  message=f"Failed to extract base sequence pairs for ID {gene_id}.")
             return
 
         raw_sequence = seq_data.get("seq")
@@ -245,7 +272,8 @@ class GenomeRequestHandler(http.server.BaseHTTPRequestHandler):
     def handle_gene_info(self, gene_name, is_json):
         data = get_ensembl_data(f"/lookup/symbol/homo_sapiens/{gene_name}")
         if data is None or "id" not in data:
-            self.serve_error_file(is_json)
+            self.serve_error_file(is_json, title="Gene Not Found",
+                                  message=f"No information available for gene '{gene_name}'.")
             return
 
         g_id = data.get("id")
@@ -274,13 +302,15 @@ class GenomeRequestHandler(http.server.BaseHTTPRequestHandler):
     def handle_gene_calc(self, gene_name, is_json):
         lookup_data = get_ensembl_data(f"/lookup/symbol/homo_sapiens/{gene_name}")
         if lookup_data is None or "id" not in lookup_data:
-            self.serve_error_file(is_json)
+            self.serve_error_file(is_json, title="Gene Not Found",
+                                  message=f"Cannot run analytics on missing gene '{gene_name}'.")
             return
 
         gene_id = lookup_data.get("id")
         seq_data = get_ensembl_data(f"/sequence/id/{gene_id}")
         if seq_data is None or "seq" not in seq_data:
-            self.serve_error_file(is_json)
+            self.serve_error_file(is_json, title="Sequence Error",
+                                  message="Could not read sequence to process calculations.")
             return
 
         my_sequence_obj = Seq(seq_data.get("seq"))
@@ -303,7 +333,8 @@ class GenomeRequestHandler(http.server.BaseHTTPRequestHandler):
     def handle_gene_list(self, chromo, start, end, is_json):
         data = get_ensembl_data(f"/overlap/region/homo_sapiens/{chromo}:{start}-{end}?feature=gene")
         if data is None or type(data) is not list:
-            self.serve_error_file(is_json)
+            self.serve_error_file(is_json, title="Region Error",
+                                  message="Failed to extract mapping data for the requested coordinates.")
             return
 
         gene_names_found = []
@@ -333,7 +364,6 @@ class GenomeRequestHandler(http.server.BaseHTTPRequestHandler):
         self.wfile.write(content_bytes)
 
     def send_json_response(self, status_code, data_dict):
-        """Sends clean formatted JSON responses back to the programmatic caller"""
         json_string = json.dumps(data_dict, indent=4)
         json_bytes = json_string.encode("utf-8")
 
@@ -343,15 +373,19 @@ class GenomeRequestHandler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(json_bytes)
 
-    def serve_error_file(self, is_json):
+    def serve_error_file(self, is_json, title="Error", message="An unexpected error occurred."):
         if is_json:
-            self.send_json_response(404, {"error": "Resource not found or database record entry completely missing."})
+            self.send_json_response(404, {"error": title, "details": message})
             return
 
         try:
-            with Path("error.html").open("rb") as f:
-                content = f.read()
-                self.send_html_response(404, content)
+            # Fix: Open as text 'r', format the strings, then encode back to bytes!
+            with Path("error.html").open("r", encoding="utf-8") as f:
+                template = f.read()
+
+            formatted_html = template.format(title=title, message=message)
+            self.send_html_response(404, formatted_html.encode("utf-8"))
+
         except FileNotFoundError:
             self.send_response(500)
             self.send_header("Content-Type", "text/plain")
