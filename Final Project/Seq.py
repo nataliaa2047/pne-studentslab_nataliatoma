@@ -1,5 +1,3 @@
-# Final-project/Seq.py
-
 class Seq:
     def __init__(self, sequence_string):
         self.seq = sequence_string.upper().strip()
