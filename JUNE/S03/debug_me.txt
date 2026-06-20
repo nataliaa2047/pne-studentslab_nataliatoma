@@ -1,0 +1,6 @@
+The bug is taking place because there's an error when trying to execute result 2, and that's specifically because of t1.
+The reason why this happens is because, in result 2, t1 is zero, which means that t0 must be divided by zero, which is
+not possible because division by zero is undefined, adn that's why the system directly detects it as an error. So, in
+order to solve our problem, we need to check if t1 is equal to zero before doing the division and decide what the
+program should return in that case, instead of letting it crash. For example, we can return an error message or another
+specific value when t1 is zero.
