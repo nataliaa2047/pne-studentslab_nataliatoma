@@ -14,8 +14,7 @@ def bases_counter(seq):
             count_t += 1
     return count_a, count_c, count_g, count_t
 
-sequence = input("Please, enter a sequence: ")
-print(f"Introduce the sequence: {sequence}")
+sequence = input("Introduce the sequence: ")
 print(f"Total length: {len(sequence)}")
 print(f"A: {bases_counter(sequence)[0]}")
 print(f"C: {bases_counter(sequence)[1]}")
