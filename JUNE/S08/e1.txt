@@ -1,0 +1,3 @@
+Machine      | Interface | Date       | Place           | IP
+mobile       | Wifi      | 06/03/2026 | Fuenlabrada Lab | 10.8.45.10
+Lab computer | Wire      | 06/03/2026 | Fuenlabrada Lab | 212.128.255.41
