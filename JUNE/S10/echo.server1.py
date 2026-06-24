@@ -1,5 +1,5 @@
 import socket
-from termcolor import colored
+import termcolor
 
 # -- Step 1: create the socket
 ls = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -25,8 +25,6 @@ ls.listen()
 
 print("The server is configured!")
 
-client_list = []
-
 while True:
     # -- Waits for a client to connect
     print("Waiting for Clients to connect")
@@ -38,26 +36,33 @@ while True:
     except KeyboardInterrupt:
         print("Server stopped by the user")
 
-    client_list.append(client_ip_port)
-    print(f"A client has connected frpm {client_ip_port} (Total connections: {len(client_list)})")
+        # -- Close the listening socket
+        ls.close()
 
-    try:
+        # -- Exit!
+        exit()
+
+    # -- Execute this part if there are no errors
+    else:
+
+        print("A client has connected to the server!")
+
+        # -- Read the message from the client
+        # -- The received message is in raw bytes
         msg_raw = cs.recv(2048)
-        msg = msg_raw.decode().strip()
+
+        # -- We decode it for converting it
+        # -- into a human-redeable string
+        msg = msg_raw.decode()
+
+        # -- Print the received message
         termcolor.cprint(f"Message received: {msg}", "green")
-        response = f"ECHO: {msg}\n"
+
+        # -- Send a response message to the client
+        response = f"ECHO {msg}\n"
+
+        # -- The message has to be encoded into bytes
         cs.send(response.encode())
-    except Exception as e:
-        print(f"Error while handling client: {e}")
-    finally:
+
+        # -- Close the data socket
         cs.close()
-
-    ls.close()
-
-    if len(client_list) >= 5:
-        print("Client connection summary:")
-        for i, (ip, port) in enumerate(client_list, start=1):
-            print(f" {i}, IP: {ip}, PORT: {port}")
-            print("Server shutting down after 5 connections.")
-            ls.close()
-            exit()
