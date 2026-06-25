@@ -51,7 +51,7 @@ def process_client(s):
     header = "Content-Type: text/plain\n"
 
     # -- Add the Content-Length
-    header += f"Content-Length: {5}\n"
+    header += f"Content-Length: {len(body)}\n"
 
     # -- Build the message by joining together all the parts
     response_msg = status_line + header + "\n" + body
