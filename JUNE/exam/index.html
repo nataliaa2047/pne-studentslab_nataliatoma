@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">   <!-- the "lang='en" part tells the browser that the main language used on the page is English -->
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome!!</title>
+</head>
+<body style="background-color: #fcfce3;">
+    <h1>Browsing Human and Vertebrates genome</h1>   <!-- h1 is the main title -->
+    <h2>BASIC Level Services</h2>         <!-- h2 is the subheading -->
+
+    <p>1) List of species in the genome database</p>    <!-- the p stands for paragragh -->
+    <form action="/listSpecies" method="GET">        <!-- action="/listSpecies" means: "When the user clicks submit, send their information to a hidden backend program located at the address /listSpecies." -->
+        <label>Limit : </label>           <!-- it just prints the plain text "Label" next to a box so the user knows what to type -->
+        <input type="text" name="limit">                 <!-- it creates the emty box that the user can type into -->
+        <input type="submit" value="Send">
+    </form>
+
+    <p>2) Information about the karyotype :</p>
+    <form action="/karyotype" method="GET">
+        <label>Select the species : </label>
+        <input type="text" name="species">
+        <input type="submit" value="Send">
+    </form>
+
+    <p>3) Chromosome Length</p>
+    <form action="/chromosomeLength" method="GET">
+        <label>Select the species : </label>
+        <input type="text" name="species">
+        <br><br>                                   <!-- it's hitting enter, not one time but two (line breaks) -->
+        <label>Select a chromosome : </label>
+        <input type="text" name="chromo">
+        <input type="submit" value="Send">
+    </form>
+
+    <h2>EXAM: Comparative Gene Architecture</h2>
+    <form action="/compare_genes" method="GET">
+        <label>Gene 1 (Ensembl ID): </label>
+        <input type="text" name="g1">
+        <br><br>                                   <!-- it's hitting enter, not one time but two (line breaks) -->
+        <label>Gene 2 (Ensembl ID): </label>
+        <input type="text" name="g2">
+        <br><br>
+        <input type="submit" value="Compare Genes">
+    </form>
+
+</body>
+</html>
